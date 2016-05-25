@@ -1,0 +1,317 @@
+function firstAlert() {
+  var ui = SpreadsheetApp.getUi(); // Same variations.
+
+  var result = ui.alert(
+     "Marcus Fong's PFO Mentoring program organiser. Click 'Yes' to begin the matching or click 'No' to send the emails to the matched families.",
+     '© 2016-2016 Marcus Fong', 
+      ui.ButtonSet.YES_NO_CANCEL);
+
+  // Process the user's response.
+  if (result == ui.Button.YES) {
+    // User clicked "Yes".
+    ui.alert('The matching has begun. Please wait a couple moments for the computer to process the data.');
+    matchFunction();
+  } if (result == ui.Button.NO) {
+    // User clicked "No" or X in the title bar.
+    emailAlert();
+  } else {
+    ui.alert('好极了！Thank you for using my program. Have a nice day!');
+  }
+  
+}
+
+function emailAlert() {
+ var ui = SpreadsheetApp.getUi();
+  
+ var result2 = ui.alert(
+    "Would you like to send emails then?",
+    "Warning: The emails sent will be to the ones matched by the computer only. Press 'Yes' to confirm.",
+    ui.ButtonSet.YES_NO);
+  
+  if (result2 == ui.Button.YES) {
+    ui.alert('The matched families will be sent an email on who their new mentee/mentor is shortly.');
+    sendEmails();
+  } if (result2 == ui.Button.NO) {
+    ui.alert("Wow... If you pressed 'No' twice, how am I supposed to know what you want to do?");
+  } if (result2 == ui.Button.CANCEL) {
+    ui.alert("好极了！Thank you for using my program. Have a nice day!");
+  }
+}
+
+
+
+function matchFunction()
+  {
+  var spreadSheet = SpreadsheetApp.openById("1F4zEJXKN3iobK8b89Ub94dd77Tdk70H0X8aFCSCmvRs");
+  var activeSheetOne = spreadSheet.getSheetByName("New Family Responses");
+  var activeSheetTwo = spreadSheet.getSheetByName("Existing Family Responses");
+ 
+  
+  
+  
+  //Reading spreedsheet one  
+  var readingGender = activeSheetOne.getRange(2,5,9,1);
+  var readingGenderVals = readingGender.getValues();
+  var lastRow = readingGender.getLastRow();
+  
+  //Reading spreadsheet one (grades)
+  var readingGrade = activeSheetOne.getRange(2,6,9,1);
+  var readingGradeVals = readingGrade.getValues();
+  var lastRowGrade = readingGrade.getLastRow();
+  
+  
+  //Reading spreedsheet two
+  var readingGender2 = activeSheetTwo.getRange(2,5,8,1);
+  var readingGenderVals2 = readingGender2.getValues();
+  var lastRow2 = readingGender2.getLastRow();
+  
+  //Reading spreadsheet two (grades)
+  var readingGrade2 = activeSheetTwo.getRange(2,6,9,1);
+  var readingGradeVals2 = readingGrade2.getValues();
+  var lastRowGrade2 = readingGrade2.getLastRow();
+  
+  
+  
+  //The beginning of the nested loop
+  //The loop with "z" is for the mentor families
+  for (var z=0; z < lastRowGrade2; z++) {
+  //The loop with "x" is for mentee families
+    for (var x=0; x < lastRowGrade; x++) {
+     //Changing the grade values into a string
+     var gradeVal1=readingGradeVals[x]+"";
+     var gradeVal2=readingGradeVals2[z]+"";
+     //The variables for the different rows corresponding to which loop we are on
+     var meme = 2+x;
+     var meme2 = 2+z;
+     //The range/cell to see if matched or not
+     var range = activeSheetOne.getRange(meme, 7);
+     var rangeValue = range.getValue();
+     var range2 = activeSheetTwo.getRange(meme2, 7);
+     var range2Value = range2.getValue();
+      
+     //The range to find out which family is matched with who
+     var whoMatchRange = activeSheetOne.getRange(meme, 8);
+     var whoMatchRange2 = activeSheetTwo.getRange(meme2, 8);
+      
+     var familyRange = activeSheetOne.getRange(meme, 2);
+     var familyName = familyRange.getValue();
+     var familyRange2 = activeSheetTwo.getRange(meme2, 2);
+     var familyName2 = familyRange2.getValue();
+     
+     var emailRange = activeSheetOne.getRange(meme, 4);
+     var emailVal = emailRange.getValue();
+     var emailRange2 = activeSheetTwo.getRange(meme2, 4);
+     var emailVal2 = emailRange2.getValue();
+      
+     var emailMsg="Thank you for applying to HKIS! We'll get back to shortly on who your new mentor will be.";
+     var emailMsg2="Thank you for applying for the HKIS mentor program! We'll get back to you shortly on who your mentee will be.";
+      
+     var subject = "Thank you for applying to the HKIS mentee program!";
+     var subject2 = "Thank you for applying to the HKIS mentor program!";
+     
+     if (rangeValue == "matched"){
+      continue;
+     }
+      
+      
+      
+      if (gradeVal2 == "" || gradeVal1 == ""){
+        break; 
+      }
+      if (gradeVal2.equals(gradeVal1)){
+       Logger.log("We have a match!");
+       range.setValue("matched");
+       range2.setValue("matched");
+       whoMatchRange2.setValue("matched with the " + familyName + " family!");
+       MailApp.sendEmail(emailVal2, subject2, emailMsg2);
+       whoMatchRange.setValue("matched with the " + familyName2 + " family!");
+       MailApp.sendEmail(emailVal, subject, emailMsg);
+       
+       break;
+          
+     }
+      
+   }
+  }
+}
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function sendEmails()
+  {
+    var spreadSheet = SpreadsheetApp.openById("1F4zEJXKN3iobK8b89Ub94dd77Tdk70H0X8aFCSCmvRs");
+    var activeSheetOne = spreadSheet.getSheetByName("New Family Responses");
+    var activeSheetTwo = spreadSheet.getSheetByName("Existing Family Responses");
+    
+    var readingGrade = activeSheetOne.getRange(2,6,9,1);
+    var readingGradeVals = readingGrade.getValues();
+    var lastRowGrade = readingGrade.getLastRow();
+    
+    var readingGrade2 = activeSheetTwo.getRange(2,6,9,1);
+    var readingGradeVals2 = readingGrade2.getValues();
+    var lastRowGrade2 = readingGrade2.getLastRow();
+    
+    var matchedOrNot = activeSheetOne.getRange(2,7,9,1);
+    var matchedOrNotVals = matchedOrNot.getValues();
+    var lastRow = matchedOrNot.getLastRow();
+    
+    var matchedOrNot2 = activeSheetTwo.getRange(2,7,9,1);
+    var matchedOrNotVals2 = matchedOrNot2.getValues();
+    var lastRow2 = matchedOrNot2.getLastRow();
+    
+    for (var z=0; z < lastRowGrade; z++) {
+      for (var x=0; x < lastRowGrade2; x++) {
+        var meme = 2+x;
+        var meme2 = 2+z;
+     //The range/cell to see if matched or not
+        var range = activeSheetOne.getRange(meme, 7);
+        var rangeValue = range.getValue();
+        var range2 = activeSheetTwo.getRange(meme2, 7);
+        var range2Value = range2.getValue();
+      
+        var familyRange = activeSheetOne.getRange(meme, 2);
+        var familyName = familyRange.getValue();
+        var familyRange2 = activeSheetTwo.getRange(meme2, 2);
+        var familyName2 = familyRange2.getValue();
+     
+        var emailRange = activeSheetOne.getRange(meme, 4);
+        var emailVal = emailRange.getValue();
+        var emailRange2 = activeSheetTwo.getRange(meme2, 4);
+        var emailVal2 = emailRange2.getValue();
+        
+        var emailSent = activeSheetOne.getRange(meme, 9);
+        var emailSentVal = emailSent.getValue();
+        var emailSent2 = activeSheetTwo.getRange(meme2, 9);
+        var emailSentVal2 = emailSent2.getValue();
+      
+        var emailMsg = "Your new mentor for HKIS will be the " + familyName2 + " family!";
+        var emailMsg2 = "Your new mentee for HKIS will be the " + familyName + " family!";
+      
+        var subject = "Your mentor2 for HKIS has been found!";
+        var subject2 = "Your mentee1 for HKIS has been found!";
+     
+        
+        if (emailSentVal2 == "email sent!" || emailSentVal == "email sent!"){
+          continue; 
+        }
+        
+        if (rangeValue == "matched"){
+          Logger.log("email sent!");
+          emailSent.setValue("email sent!");
+          emailSent2.setValue("email sent!");
+          MailApp.sendEmail(emailVal2, subject2, emailMsg2); 
+          MailApp.sendEmail(emailVal, subject, emailMsg);
+          
+        }
+      }     
+    }
+    
+    
+  }
+    
+    
+    
+  
+
+
+  
+  
+  //this code is for matching genders
+  //it was only made to help me figure out what to do 
+  
+  /*
+  for (var a=0; a < 3; a++) {
+    for (var b=0; b < 3; b++){
+      
+      
+      var genderVal1=readingGenderVals[b]+"";
+      var genderVal2=readingGenderVals2[a]+"";      
+      
+      //checking for male matches
+      if (genderVal2 == "M"){
+        
+        if (genderVal2.equals(genderVal1)){
+          
+          
+        }
+      }
+      
+      //checking for female matches
+      else if(genderVal2 == "F"){
+       
+        if (genderVal2.equals(genderVal1)){
+         Logger.log("yee"); 
+        
+        }
+      
+      }
+      
+      
+      
+    }
+      
+      
+      
+        
+  }
+   */
+      
+      //Logger.log(readingGenderVals[a] + ", " +readingGenderVals2[b]); 
+     
+
+
+  
+                                 
+   
+  /*
+  
+  for (var x=0; x < lastRow; x++) {
+    //gender.push(readingGenderVals[x]);
+    //genderNum.push(x);
+    if (readingGenderVals[x] == "Male"){
+      genderValsMale.push(x);
+    } else if (readingGenderVals[x] == "Female"){
+      genderValsFemale.push(x);
+  }
+    
+    
+  }
+     
+  Logger.log(genderValsMale);
+  Logger.log(genderValsFemale);
+  /*
+  
+ 
+  
+  /*for (m=0; m < genderValsMale.length; m++) {
+    if (gender
+  }
+  
+  for (f=0; f < genderValsFemale.length; f++) {
+    
+  }
+  */
+
+  
+      
+
+
+
+
+
+
+
+
